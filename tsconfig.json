@@ -11,7 +11,9 @@
       "@components/*": ["src/components/*"],
       "@styleVar": ["src/global.scss"],
       "@assets/*": ["src/assets/*"],
-      "@pages/*": ["src/pages/*"]
+      "@pages/*": ["src/pages/*"],
+      "@utils/*": ["src/utils/*"],
+      "@enums": ["src/constants/enums.ts"],
     },
 
     /* Configurations de Vite */

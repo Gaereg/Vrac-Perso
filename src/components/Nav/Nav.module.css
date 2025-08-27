@@ -1,0 +1,38 @@
+.navWrapper {
+    color: white;
+    background-color: var(--mui-palette-secondary-dark);
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 2px solid var(--mui-palette-divider);
+
+
+    .nav {
+        display: flex;
+        align-items: center;
+
+        .link {
+            margin: 0 10px;
+            font-size: 1.2rem;
+
+            a {
+                color: var(--mui-palette-text-primary);
+                text-decoration: none;
+
+                &:hover {
+                    color: var(--mui-palette-primary-main);
+                }
+            }
+
+            :global(a.active) {
+                color: var(--mui-palette-primary-main);
+            }
+        }
+    }
+}
+
+h2 {
+    color: var(--mui-palette-primary-main);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
