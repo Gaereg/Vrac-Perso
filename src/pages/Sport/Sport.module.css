@@ -1,0 +1,39 @@
+.pageWrapper {
+  --list-width: 290px;
+  --transition: 300ms;
+  display: flex;
+}
+
+.listWrapper {
+  height: calc(100% - 200px);
+  position: fixed;
+  display: flex;
+  justify-content: flex-end;
+  overflow-y: auto;
+  transition: var(--transition);
+  width: calc(var(--list-width));
+  left: -215px;
+}
+
+.listWrapperOpen {
+  left: 0;
+}
+
+.navList {
+  padding: 10px !important;
+  width: calc(var(--list-width) - 20px);
+  position: relative !important;
+}
+
+.contentWrapper {
+  margin-left: 70px;
+  transition: var(--transition);
+}
+.contentWrapperNavOpen {
+  margin-left: calc(var(--list-width));
+}
+
+.divider {
+  margin: 10px !important;
+  height: auto !important;
+}
