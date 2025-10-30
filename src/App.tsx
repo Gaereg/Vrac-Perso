@@ -1,4 +1,5 @@
 import Login from "@pages/Login/Login";
+import Sport from "@pages/Sport/Sport";
 import Nav from "@components/Nav/Nav";
 import Pomodoro from "@components/Pomodoro/Pomodoro";
 import Workspaces from "@pages/Workspaces/Workspaces";
@@ -18,7 +19,6 @@ function App() {
   useEffect(() => {
     const getSession = async () => {
       const resClaim = await supabase.auth.getClaims();
-
       if (resClaim.data?.claims.role === "authenticated") {
         setIsLog(true);
       }
@@ -45,7 +45,14 @@ function App() {
                   path="*"
                   element={isLog ? <Workspaces /> : <Login setIsLog={setIsLog} />}
                 />
-                
+                 <Route
+                  path="/sport"
+                  element={
+                    <ProtectedRoute isLog={isLog}>
+                      <Sport />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path="/workspaces"
                   element={
