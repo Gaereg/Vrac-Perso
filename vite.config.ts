@@ -17,6 +17,7 @@ export default defineConfig({
       "@utils": path.resolve(__dirname, "./src/utils"),
       "@styleVar": path.resolve(__dirname, "./src/global.scss"),
       "@enums": path.resolve(__dirname, "./src/constants/enums.ts"),
+      "@clientSupabase": path.resolve(__dirname, "./src/supabase.ts"),
     },
   },
   plugins: [react()],

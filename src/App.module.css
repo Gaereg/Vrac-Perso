@@ -3,3 +3,7 @@ body {
     background-color: var(--mui-palette-background-default);
     font-family: sans-serif;
 }
+
+.container {
+    padding: 30px 0;
+}

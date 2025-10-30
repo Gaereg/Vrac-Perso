@@ -14,6 +14,7 @@
       "@pages/*": ["src/pages/*"],
       "@utils/*": ["src/utils/*"],
       "@enums": ["src/constants/enums.ts"],
+      "@clientSupabase": ["src/supabase.ts"]
     },
 
     /* Configurations de Vite */
@@ -30,6 +31,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
+  "include": ["src", "supabase.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
