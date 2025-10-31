@@ -25,7 +25,7 @@ const NestedItemList = ({ name, items }: { name: string; items: TItems }) => {
       <Collapse in={isOpen} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {items.map((item) => (
-            <ListItemButton sx={{ pl: 4 }}>
+            <ListItemButton sx={{ pl: 4 }} key={item.name}>
               <ListItemText primary={item.name} />
             </ListItemButton>
           ))}

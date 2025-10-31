@@ -10,8 +10,22 @@
   padding: 20px;
 }
 
-.btnCloseWrapper {
+.modalHeader {
+  height: 32px;
   display: flex;
-  justify-content: flex-end;
-  margin: -15px -15px 15px 0;
+  justify-content: center;
+  align-items: center;
+  margin: -10px -15px 15px 0;
+}
+
+.btnClose {
+  position: absolute !important;
+  right: 5px;
+  top: 5px;
+}
+
+.btnGoSummary {
+  position: absolute !important;
+  left: 5px;
+  top: 5px;
 }

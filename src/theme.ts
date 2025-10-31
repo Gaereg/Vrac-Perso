@@ -22,6 +22,7 @@ const darkBlue = "#1c5765";
 const darkBlueLight = "#317586";
 const darkBlueDark = "#0b3d49";
 const lightGrey = "#696565";
+const lighterGrey = "#C2C0C0";
 const darkGrey = "#1b1919";
 
 const theme = createTheme({
@@ -32,18 +33,18 @@ const theme = createTheme({
       main: orange,
       light: orangeLight,
       dark: orangeDark,
-      contrastText: "white",
+      contrastText: "#ff",
     },
     secondary: {
       main: darkBlue,
       light: darkBlueLight,
       dark: darkBlueDark,
-      contrastText: "white",
+      contrastText: "#ff",
     },
     divider: lightGrey,
     text: {
-      primary: "white",
-      secondary: lightGrey,
+      primary: "#ff",
+      secondary: lighterGrey,
     },
     background: {
       default: darkGrey,

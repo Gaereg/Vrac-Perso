@@ -12,6 +12,7 @@ import NestedItemList from "@components/NestedItemList/NestedItemList";
 import { Container, IconButton } from "@mui/material";
 import classNames from "classnames";
 import ModalAdd from "@pages/Sport/ModalAdd/ModalAdd";
+import DialogAlert from "@components/DialogAlert/DialogAlert";
 
 const Sport = () => {
   const [isModalAddOpen, setIsModalAddOpen] = useState(false);
@@ -21,12 +22,14 @@ const Sport = () => {
   const handleToggleNavOpen = () => setIsNavOpen((state) => !state);
 
   const handleOpenModalAdd = () => setIsModalAddOpen(true);
-  const handleCloseModalAdd = (isAlertClose) => {
-    console.log(isAlertClose);
-    
-    if (isAlertClose) setIsAlertModalOpen(true)
-    else setIsModalAddOpen(false)
+  const handleCloseModalAdd = (isAlertClose: boolean) => {
+    if (isAlertClose) setIsAlertModalOpen(true);
+    else {
+      setIsModalAddOpen(false);
+      setIsAlertModalOpen(false);
+    }
   };
+  const handleCloseIsAlertModalOpen = () => setIsAlertModalOpen(false);
 
   return (
     <Box className={styles.pageWrapper}>
@@ -42,7 +45,7 @@ const Sport = () => {
         >
           <Button aria-label="create" fullWidth onClick={handleOpenModalAdd}>
             <AddIcon />
-            Ajouter
+            Ajouter / Modifier
           </Button>
           <NestedItemList
             name="Semaine 1"
@@ -62,7 +65,15 @@ const Sport = () => {
       >
         <Container maxWidth="xl">TOTO</Container>
       </Box>
-        <ModalAdd isOpen={isModalAddOpen} closeModal={handleCloseModalAdd}/>
+      <ModalAdd isOpen={isModalAddOpen} closeModal={handleCloseModalAdd} />
+
+      <DialogAlert
+        isOpen={isAlertModalOpen}
+        confirm={() => handleCloseModalAdd(false)}
+        cancel={handleCloseIsAlertModalOpen}
+        title="Voulez-vous vraiment fermer la modal ?"
+        content="Tous travail non sauvegardé sera perdu"
+      />
     </Box>
   );
 };
