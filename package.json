@@ -8,7 +8,8 @@
     "test": "vitest",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "supabase_gen_types": "npm supabase gen types typescript --project-id abcdefghijklmnopqrst > database.types.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -20,6 +21,8 @@
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.77.0",
+    "@tanstack/react-query": "^5.90.7",
+    "@tanstack/react-query-devtools": "^5.90.2",
     "classnames": "^2.5.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -28,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@tanstack/eslint-plugin-query": "^5.91.2",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.12",

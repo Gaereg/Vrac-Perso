@@ -10,14 +10,14 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@src": path.resolve(__dirname, "./src"),
       "@assets": path.resolve(__dirname, "./src/assets"),
       "@components": path.resolve(__dirname, "./src/components"),
       "@pages": path.resolve(__dirname, "./src/pages"),
       "@utils": path.resolve(__dirname, "./src/utils"),
-      "@styleVar": path.resolve(__dirname, "./src/global.scss"),
       "@enums": path.resolve(__dirname, "./src/constants/enums.ts"),
       "@clientSupabase": path.resolve(__dirname, "./src/supabase.ts"),
+      "@queries": path.resolve(__dirname, "./src/queries"),
     },
   },
   plugins: [react()],

@@ -6,15 +6,15 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    "baseUrl": ".", 
+    "baseUrl": ".",
     "paths": {
       "@components/*": ["src/components/*"],
-      "@styleVar": ["src/global.scss"],
       "@assets/*": ["src/assets/*"],
       "@pages/*": ["src/pages/*"],
       "@utils/*": ["src/utils/*"],
       "@enums": ["src/constants/enums.ts"],
-      "@clientSupabase": ["src/supabase.ts"]
+      "@clientSupabase": ["src/supabase.ts"],
+      "@queries/*": ["src/queries/*"]
     },
 
     /* Configurations de Vite */

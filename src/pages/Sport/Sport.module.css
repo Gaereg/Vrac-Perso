@@ -29,6 +29,7 @@
   margin-left: 70px;
   transition: var(--transition);
 }
+
 .contentWrapperNavOpen {
   margin-left: calc(var(--list-width));
 }

@@ -6,24 +6,33 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { TModalAddPage } from "@pages/Sport/ModalAdd/ModalAddTypes";
 import ModalSummary from "@pages/Sport/ModalAdd/ModalPage/ModalSummary";
 import ModalTypesExo from "@pages/Sport/ModalAdd/ModalPage/ModalTypesExo";
+import { useGetTypesExo } from "@queries/sportQueries/typesExo.ts";
+import DialogAlert from "@components/DialogAlert/DialogAlert";
 
 const ModalAdd = ({
   isOpen,
-  closeModal,
+  closeModalAdd,
 }: {
   isOpen: boolean;
-  closeModal: (isAlertCloseModal: boolean) => void;
+  closeModalAdd: () => void;
 }) => {
   const [page, setPage] = useState<TModalAddPage>("summary");
-  const handleCloseModal = () => closeModal(false);
-  const alertCloseModal = () => closeModal(true);
+  const [isAlertCloseOpen, setIsAlertCloseOpen] = useState(false);
+  const [hasUnsaveWork, setHasUnsaveWork] = useState(false);
 
   const handleGoSummary = () => setPage("summary");
+  const typesExo = useGetTypesExo();
 
   const modalContent = () => {
     switch (page) {
       case "typesExo":
-        return <ModalTypesExo />;
+        return (
+          <ModalTypesExo
+            typesExo={typesExo.data}
+            isPending={typesExo.isPending}
+            setHasUnsaveWork={setHasUnsaveWork}
+          />
+        );
       default:
         return <ModalSummary setPage={setPage} />;
     }
@@ -37,29 +46,53 @@ const ModalAdd = ({
         return "";
     }
   };
+  const closeModal = () => {
+    setPage("summary");
+    closeModalAdd();
+  };
+
+  const handleCloseModal = () =>
+    hasUnsaveWork ? setIsAlertCloseOpen(true) : closeModal();
+
+  const handleCancelAlert = () => setIsAlertCloseOpen(false);
+  const handleConfirmAlert = () => {
+    setHasUnsaveWork(false);
+    setIsAlertCloseOpen(false);
+    closeModal();
+  };
 
   return (
-    <Modal
-      open={isOpen}
-      onClose={handleCloseModal}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box className={styles.modal}>
-        <Box className={styles.modalHeader}>
-          {page !== "summary" && (
-            <IconButton onClick={handleGoSummary} className={styles.btnGoSummary}>
-              <ArrowBackIcon />
+    <>
+      <Modal
+        open={isOpen}
+        onClose={handleCloseModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box className={styles.modal}>
+          <Box className={styles.modalHeader}>
+            {page !== "summary" && (
+              <IconButton onClick={handleGoSummary} className={styles.btnGoSummary}>
+                <ArrowBackIcon />
+              </IconButton>
+            )}
+            <Typography variant="h6">{modalTitle()}</Typography>
+            <IconButton onClick={handleCloseModal} className={styles.btnClose}>
+              <CloseIcon />
             </IconButton>
-          )}
-          <Typography variant="h6">{modalTitle()}</Typography>
-          <IconButton onClick={alertCloseModal} className={styles.btnClose}>
-            <CloseIcon />
-          </IconButton>
+          </Box>
+          <Box>{modalContent()}</Box>
         </Box>
-        <Box>{modalContent()}</Box>
-      </Box>
-    </Modal>
+      </Modal>
+
+      <DialogAlert
+        isOpen={isAlertCloseOpen}
+        confirm={handleConfirmAlert}
+        cancel={handleCancelAlert}
+        title="Voulez-vous vraiment fermer la modal ?"
+        content="Tous travail non sauvegardé sera perdu"
+      />
+    </>
   );
 };
 
