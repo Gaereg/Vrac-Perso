@@ -5,9 +5,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { TModalAddPage } from "@pages/Sport/ModalAdd/ModalAddTypes";
 import ModalSummary from "@pages/Sport/ModalAdd/ModalPage/ModalSummary";
-import ModalTypesExo from "@pages/Sport/ModalAdd/ModalPage/ModalTypesExo";
-import { useGetTypesExo } from "@queries/sportQueries/typesExo.ts";
 import DialogAlert from "@components/DialogAlert/DialogAlert";
+import ModalTypesExo from "@pages/Sport/ModalAdd/ModalPage/ModalTypesExo";
+import ModalMuscles from "@pages/Sport/ModalAdd/ModalPage/ModalMuscles";
 
 const ModalAdd = ({
   isOpen,
@@ -21,18 +21,13 @@ const ModalAdd = ({
   const [hasUnsaveWork, setHasUnsaveWork] = useState(false);
 
   const handleGoSummary = () => setPage("summary");
-  const typesExo = useGetTypesExo();
 
   const modalContent = () => {
     switch (page) {
       case "typesExo":
-        return (
-          <ModalTypesExo
-            typesExo={typesExo.data}
-            isPending={typesExo.isPending}
-            setHasUnsaveWork={setHasUnsaveWork}
-          />
-        );
+        return <ModalTypesExo setHasUnsaveWork={setHasUnsaveWork} />;
+      case "muscles":
+        return <ModalMuscles setHasUnsaveWork={setHasUnsaveWork} />;
       default:
         return <ModalSummary setPage={setPage} />;
     }
@@ -42,6 +37,8 @@ const ModalAdd = ({
     switch (page) {
       case "typesExo":
         return "Types d'exercices";
+      case "muscles":
+        return "Muscles";
       default:
         return "";
     }

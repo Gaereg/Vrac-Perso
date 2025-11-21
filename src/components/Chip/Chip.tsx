@@ -1,6 +1,6 @@
 import DialogAlert from "@components/DialogAlert/DialogAlert";
-import { Chip as MuiChip } from "@mui/material";
-import { useState } from "react";
+import { Chip as MuiChip, Stack } from "@mui/material";
+import { useState, ReactElement } from "react";
 
 type TProps = {
   label: string;
@@ -38,6 +38,24 @@ const Chip = ({ label, onClick, onDelete, isSelected }: TProps) => {
         />
       )}
     </>
+  );
+};
+
+export const ChipWrapper = ({ children }: { children: ReactElement }) => {
+  return (
+    <Stack
+      spacing={2}
+      useFlexGap
+      direction="row"
+      marginBottom={3}
+      justifyContent="center"
+      padding="0 10px"
+      flexWrap="wrap"
+      maxHeight={90}
+      overflow="auto"
+    >
+      {children}
+    </Stack>
   );
 };
 

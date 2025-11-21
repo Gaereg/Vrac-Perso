@@ -1,33 +1,39 @@
-import Chip from "@components/Chip/Chip";
+import Chip, { ChipWrapper } from "@components/Chip/Chip";
 import { Box, Button, CircularProgress, Stack, TextField } from "@mui/material";
+import { TTypesExo } from "@queries/sportQueries/types";
 import {
   usePatchTypesExo,
   usePostTypesExo,
   useDeleteTypesExo,
-} from "@queries/sportQueries/typesExo.ts";
-import { TTypesExo } from "@queries/sportQueries/typesExo.types.ts";
+  useGetTypesExo,
+} from "@queries/sportQueries/typesExo";
 import { useEffect, useState } from "react";
 
 type TProps = {
-  isPending: boolean;
-  typesExo?: TTypesExo[];
   setHasUnsaveWork: (bool: boolean) => void;
 };
 
-const ModalTypesExo = ({ isPending, typesExo, setHasUnsaveWork }: TProps) => {
-  const [newTypeName, setNewTypesName] = useState<string>("");
+const ModalTypesExo = ({ setHasUnsaveWork }: TProps) => {
+  const [newName, setNewName] = useState<string>("");
   const [idToModify, setIdToModify] = useState<number | null>(null);
-  const postMutation = usePostTypesExo();
-  const patchMutation = usePatchTypesExo();
-  const deleteMutation = useDeleteTypesExo();
+  const typesExo = useGetTypesExo();
+
+  const successCallback = () => {
+    setNewName("");
+    setIdToModify(null);
+  };
+  
+  const postTypesMutation = usePostTypesExo(successCallback);
+  const patchTypesMutation = usePatchTypesExo(successCallback);
+  const deleteTypesMutation = useDeleteTypesExo();
 
   const handleChangeTypeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewTypesName(e.target.value);
+    setNewName(e.target.value);
   };
 
   const handleClickCancel = () => {
     setIdToModify(null);
-    setNewTypesName("");
+    setNewName("");
   };
 
   const handleClickChip = (type: TTypesExo) => {
@@ -35,73 +41,64 @@ const ModalTypesExo = ({ isPending, typesExo, setHasUnsaveWork }: TProps) => {
       handleClickCancel();
     } else {
       setIdToModify(type.id);
-      setNewTypesName(type.name);
+      setNewName(type.name);
     }
   };
 
-  const handleClickSave = () => postMutation.mutate({ name: newTypeName });
+  const handleClickSave = () => newName && postTypesMutation.mutate({ name: newName });
 
-  const handleClickUpdate = () =>
-    idToModify && patchMutation.mutate({ name: newTypeName, id: idToModify });
+  const handleClickUpdate = () => {
+    if (idToModify && newName) {
+      patchTypesMutation.mutate({ name: newName, id: idToModify });
+    }
+  };
 
-  const handleClickDelete = (id: number) => deleteMutation.mutate({ id });
+  const handleClickDelete = (id: number) => deleteTypesMutation.mutate({ id });
 
   useEffect(() => {
-    if (newTypeName) setHasUnsaveWork(true);
+    if (newName) setHasUnsaveWork(true);
     else setHasUnsaveWork(false);
 
-    return () => setHasUnsaveWork(false)
-  }, [newTypeName, setHasUnsaveWork]);
+    return () => setHasUnsaveWork(false);
+  }, [newName, setHasUnsaveWork]);
 
   return (
     <Box>
-      {isPending || !typesExo ? (
+      {typesExo.isPending || !typesExo.data ? (
         <Stack direction="row" justifyContent="center" marginBottom={3}>
           <CircularProgress size={30} />
         </Stack>
       ) : (
-        <Stack
-          spacing={2}
-          useFlexGap
-          direction="row"
-          marginBottom={3}
-          justifyContent="center"
-          padding="0 10px"
-          flexWrap="wrap"
-          maxHeight={90}
-          overflow="auto"
-        >
-          {typesExo.map((type) => (
-            <Chip
-              label={type.name}
-              key={type.id}
-              onClick={() => handleClickChip(type)}
-              isSelected={type.id === idToModify}
-              onDelete={() => handleClickDelete(type.id)}
-            />
-          ))}
-        </Stack>
+        <ChipWrapper>
+          <>
+            {typesExo.data.map((type) => (
+              <Chip
+                label={type.name}
+                key={type.id}
+                onClick={() => handleClickChip(type)}
+                isSelected={type.id === idToModify}
+                onDelete={() => handleClickDelete(type.id)}
+              />
+            ))}
+          </>
+        </ChipWrapper>
       )}
       <Stack spacing={3}>
         <TextField
           label="Type d'exercices"
-          value={newTypeName}
+          value={newName}
           onChange={handleChangeTypeName}
         />
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           {idToModify ? (
             <>
               <Button onClick={handleClickCancel}>Annuler</Button>
-              <Button
-                variant="outlined"
-                onClick={handleClickUpdate}
-                disabled={!newTypeName}
-              >
+              <Button variant="outlined" onClick={handleClickUpdate} disabled={!newName}>
                 Modifier
               </Button>
             </>
           ) : (
-            <Button variant="outlined" onClick={handleClickSave} disabled={!newTypeName}>
+            <Button variant="outlined" onClick={handleClickSave} disabled={!newName}>
               Sauvegarder
             </Button>
           )}

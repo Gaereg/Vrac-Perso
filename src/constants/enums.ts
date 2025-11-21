@@ -13,3 +13,19 @@ export enum timerValue {
   "LONG_PAUSE" = 20 * 60,
   "WORK" = 25 * 60,
 }
+
+export enum enumMuscleGrp {
+  LEGS = "LEGS",
+  BACK = "BACK",
+  CHEST = "CHEST",
+  SHOULDERS = "SHOULDERS",
+  ARMS = "ARMS",
+}
+
+export enum muscleGrpTxt {
+  LEGS = "Jambes",
+  BACK = "Dos",
+  CHEST = "Cage Thoracique",
+  SHOULDERS = "Épaules",
+  ARMS = "Bras",
+}
