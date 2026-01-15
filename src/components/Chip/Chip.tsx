@@ -1,6 +1,6 @@
 import DialogAlert from "@components/DialogAlert/DialogAlert";
 import { Chip as MuiChip, Stack } from "@mui/material";
-import { useState, ReactElement } from "react";
+import { useState, ReactNode, ReactElement } from "react";
 
 type TProps = {
   label: string;
@@ -47,7 +47,7 @@ export const ChipWrapper = ({ children }: { children: ReactElement }) => {
       spacing={2}
       useFlexGap
       direction="row"
-      marginBottom={3}
+      marginY={4}
       justifyContent="center"
       padding="0 10px"
       flexWrap="wrap"

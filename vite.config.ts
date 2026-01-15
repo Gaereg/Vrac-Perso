@@ -18,6 +18,7 @@ export default defineConfig({
       "@enums": path.resolve(__dirname, "./src/constants/enums.ts"),
       "@clientSupabase": path.resolve(__dirname, "./src/supabase.ts"),
       "@queries": path.resolve(__dirname, "./src/queries"),
+      "@contexts": path.resolve(__dirname, "./src/contexts")
     },
   },
   plugins: [react()],

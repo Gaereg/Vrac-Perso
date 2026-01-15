@@ -1,11 +1,11 @@
 import { supabase } from "@clientSupabase";
-import { TId } from "@queries/sportQueries/types";
+import { TError, TId, TQueryCallback } from "@queries/sportQueries/types";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { updateTabValue } from "@utils/array/array";
 
 export const useGet = <TData>(key: string, table: string) => {
-  const { data, isPending } = useQuery({
+  const { data, isPending, isError, error } = useQuery({
     queryKey: [key],
     queryFn: async () => {
       const res = await supabase.from(table).select();
@@ -14,29 +14,33 @@ export const useGet = <TData>(key: string, table: string) => {
     staleTime: Infinity,
   });
 
-  return { data, isPending };
+  return { data, isPending, isError, error };
 };
 
 export const usePost = <TData, TPayload>(
   key: string,
   table: string,
-  successCallback?: () => void
+  callback: TQueryCallback
 ) => {
   const queryClient = useQueryClient();
-  const { mutate, isPending, isSuccess } = useMutation({
+  const { mutate, isPending, isSuccess, isError, error } = useMutation({
     mutationFn: async (payload: TPayload) => {
       const res = await supabase.from(table).insert(payload).select();
+      if (res.error) {
+        throw res.error;
+      }
       return res.data as TData[];
     },
     onSuccess: (newData: TData[]) => {
       queryClient.setQueryData([key], (oldData: TData[]) => {
         return [...oldData, ...newData];
       });
-      if (successCallback) successCallback();
+      if (callback.onSuccess) callback.onSuccess();
     },
+    onError: (err: TError) => callback.onError(err)
   });
 
-  return { mutate, isPending, isSuccess };
+  return { mutate, isPending, isSuccess, isError, error };
 };
 
 export const usePatch = <TData extends TId, TPayload extends TId>(
@@ -45,13 +49,17 @@ export const usePatch = <TData extends TId, TPayload extends TId>(
   successCallback?: () => void
 ) => {
   const queryClient = useQueryClient();
-  const { mutate, isPending, isSuccess } = useMutation({
+  const { mutate, isPending, isSuccess, isError, error } = useMutation({
     mutationFn: async (payload: TPayload) => {
       const res = await supabase
         .from(table)
         .update(payload)
         .eq("id", payload.id)
         .select();
+
+      if (res.error) {
+        throw res.error;
+      }
 
       return res.data as TData[];
     },
@@ -64,15 +72,17 @@ export const usePatch = <TData extends TId, TPayload extends TId>(
     },
   });
 
-  return { mutate, isPending, isSuccess };
+  return { mutate, isPending, isSuccess, isError, error };
 };
 
 export const useDelete = <TData extends TId>(key: string, table: string) => {
   const queryClient = useQueryClient();
-  const { mutate, isPending } = useMutation({
+  const { mutate, isPending, isError, error } = useMutation({
     mutationFn: async (payload: TId) => {
       const res = await supabase.from(table).delete().eq("id", payload.id).select();
-
+      if (res.error) {
+        throw res.error;
+      }
       return res.data as TData[];
     },
     onSuccess: (updatedData: TData[]) => {
@@ -83,5 +93,5 @@ export const useDelete = <TData extends TId>(key: string, table: string) => {
     },
   });
 
-  return { mutate, isPending };
+  return { mutate, isPending, isError, error };
 };

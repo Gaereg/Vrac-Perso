@@ -9,6 +9,7 @@ import {
 } from "@queries/sportQueries/muscles";
 import { useEffect, useState } from "react";
 import { enumMuscleGrp, muscleGrpTxt } from "@enums";
+import { useAlertDispatch } from "@contexts/Alert/AlertContext";
 
 type TProps = {
   setHasUnsaveWork: (bool: boolean) => void;
@@ -19,13 +20,17 @@ const ModalMuscles = ({ setHasUnsaveWork }: TProps) => {
   const [muscleGrp, setMusclesGrp] = useState<enumMuscleGrp>(enumMuscleGrp.LEGS);
   const [idToModify, setIdToModify] = useState<number | null>(null);
   const { data, isPending } = useGetMuscles();
+  const { addError } = useAlertDispatch();
 
-    const successCallback = () => {
+  const successCallback = () => {
     setNewName("");
     setIdToModify(null);
   };
 
-  const postMusclesMutation = usePostMuscles(successCallback);
+  const postMusclesMutation = usePostMuscles({
+    onSuccess: successCallback,
+    onError: (err) => addError({ ...err, table: "muscles" }),
+  });
   const patchMusclesMutation = usePatchMuscles(successCallback);
   const deleteMusclesMutation = useDeleteMuscles();
 
@@ -97,9 +102,9 @@ const ModalMuscles = ({ setHasUnsaveWork }: TProps) => {
         </ChipWrapper>
       )}
       <Stack spacing={3}>
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} justifyContent="center">
           <TextField
-            sx={{width: '200px'}}
+            sx={{ width: "230px" }}
             select
             label="Groupe musculaire"
             value={muscleGrp}
@@ -111,7 +116,12 @@ const ModalMuscles = ({ setHasUnsaveWork }: TProps) => {
               </MenuItem>
             ))}
           </TextField>
-          <TextField label="Muscle" value={newName} onChange={handleChangeTypeName} />
+          <TextField
+            label="Muscle"
+            value={newName}
+            onChange={handleChangeTypeName}
+            sx={{ width: "300px" }}
+          />
         </Stack>
         <Stack direction="row" spacing={2} justifyContent="flex-end">
           {idToModify ? (
@@ -122,7 +132,11 @@ const ModalMuscles = ({ setHasUnsaveWork }: TProps) => {
               </Button>
             </>
           ) : (
-            <Button variant="outlined" onClick={handleClickSave} disabled={!newName || !muscleGrp}>
+            <Button
+              variant="outlined"
+              onClick={handleClickSave}
+              disabled={!newName || !muscleGrp}
+            >
               Sauvegarder
             </Button>
           )}

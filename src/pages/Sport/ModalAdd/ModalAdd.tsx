@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Modal, Box, IconButton, Typography } from "@mui/material";
 import styles from "./ModalAdd.module.css";
 import CloseIcon from "@mui/icons-material/Close";
@@ -8,6 +8,7 @@ import ModalSummary from "@pages/Sport/ModalAdd/ModalPage/ModalSummary";
 import DialogAlert from "@components/DialogAlert/DialogAlert";
 import ModalTypesExo from "@pages/Sport/ModalAdd/ModalPage/ModalTypesExo";
 import ModalMuscles from "@pages/Sport/ModalAdd/ModalPage/ModalMuscles";
+import ModalExo from "@pages/Sport/ModalAdd/ModalPage/ModalExo";
 
 const ModalAdd = ({
   isOpen,
@@ -28,6 +29,8 @@ const ModalAdd = ({
         return <ModalTypesExo setHasUnsaveWork={setHasUnsaveWork} />;
       case "muscles":
         return <ModalMuscles setHasUnsaveWork={setHasUnsaveWork} />;
+      case "exercices":
+        return <ModalExo setHasUnsaveWork={setHasUnsaveWork} />;
       default:
         return <ModalSummary setPage={setPage} />;
     }
@@ -39,6 +42,8 @@ const ModalAdd = ({
         return "Types d'exercices";
       case "muscles":
         return "Muscles";
+      case "exercices":
+        return "Exercices";
       default:
         return "";
     }
@@ -58,6 +63,20 @@ const ModalAdd = ({
     closeModal();
   };
 
+  const modalWidth = useMemo(() => {
+    switch (page) {
+      case "summary":
+        return "400px";
+      case "muscles":
+      case "typesExo":
+        return "600px";
+      case "exercices":
+        return "800px";
+      default:
+        return "400px";
+    }
+  }, [page]);
+
   return (
     <>
       <Modal
@@ -66,7 +85,7 @@ const ModalAdd = ({
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box className={styles.modal}>
+        <Box className={styles.modal} maxWidth={modalWidth} minWidth="400px">
           <Box className={styles.modalHeader}>
             {page !== "summary" && (
               <IconButton onClick={handleGoSummary} className={styles.btnGoSummary}>

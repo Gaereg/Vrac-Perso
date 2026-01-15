@@ -11,6 +11,7 @@ import styles from "./App.module.css";
 import theme from "./theme";
 import { useEffect, useState } from "react";
 import { supabase } from "@clientSupabase";
+import { Alert } from "@components/Alert/Alert";
 
 function App() {
   const [isLog, setIsLog] = useState<boolean>(false);
@@ -31,6 +32,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <EmotionThemeProvider theme={theme}>
+        <Alert />
         {!isLoading && (
           <BrowserRouter>
             <ProtectedRoute isLog={isLog}>

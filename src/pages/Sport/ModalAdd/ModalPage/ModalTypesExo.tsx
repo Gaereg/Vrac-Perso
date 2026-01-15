@@ -8,6 +8,7 @@ import {
   useGetTypesExo,
 } from "@queries/sportQueries/typesExo";
 import { useEffect, useState } from "react";
+import { useAlertDispatch } from "@contexts/Alert/AlertContext";
 
 type TProps = {
   setHasUnsaveWork: (bool: boolean) => void;
@@ -17,13 +18,17 @@ const ModalTypesExo = ({ setHasUnsaveWork }: TProps) => {
   const [newName, setNewName] = useState<string>("");
   const [idToModify, setIdToModify] = useState<number | null>(null);
   const typesExo = useGetTypesExo();
+  const { addError } = useAlertDispatch();
 
   const successCallback = () => {
     setNewName("");
     setIdToModify(null);
   };
-  
-  const postTypesMutation = usePostTypesExo(successCallback);
+
+  const postTypesMutation = usePostTypesExo({
+    onSuccess: successCallback,
+    onError: (err) => addError({ ...err, table: "typesExo" }),
+  });
   const patchTypesMutation = usePatchTypesExo(successCallback);
   const deleteTypesMutation = useDeleteTypesExo();
 

@@ -54,6 +54,17 @@ const theme = createTheme({
       main: sand,
     },
   },
+  components: {
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          '&.Mui-selected': {
+            backgroundColor: orange
+          }
+        }
+      }
+    }
+  }
 });
 
 export default theme;
