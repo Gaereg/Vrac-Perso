@@ -20,19 +20,25 @@ const ModalMuscles = ({ setHasUnsaveWork }: TProps) => {
   const [muscleGrp, setMusclesGrp] = useState<enumMuscleGrp>(enumMuscleGrp.LEGS);
   const [idToModify, setIdToModify] = useState<number | null>(null);
   const { data, isPending } = useGetMuscles();
-  const { addError } = useAlertDispatch();
+  const { addError, closeAlert } = useAlertDispatch();
 
   const successCallback = () => {
     setNewName("");
     setIdToModify(null);
+    closeAlert();
   };
 
   const postMusclesMutation = usePostMuscles({
     onSuccess: successCallback,
     onError: (err) => addError({ ...err, table: "muscles" }),
   });
-  const patchMusclesMutation = usePatchMuscles(successCallback);
-  const deleteMusclesMutation = useDeleteMuscles();
+  const patchMusclesMutation = usePatchMuscles({
+    onSuccess: successCallback,
+    onError: (err) => addError({ ...err, table: "muscles" }),
+  });
+  const deleteMusclesMutation = useDeleteMuscles({
+    onError: (err) => addError({ ...err, table: "muscles" }),
+  });
 
   const handleChangeTypeName = (e: React.ChangeEvent<HTMLInputElement>) =>
     setNewName(e.target.value);
@@ -71,7 +77,7 @@ const ModalMuscles = ({ setHasUnsaveWork }: TProps) => {
     }
   };
 
-  const handleClickDelete = (id: number) => deleteMusclesMutation.mutate({ id });
+  const handleClickDelete = (id: number) => deleteMusclesMutation.mutate(id);
 
   useEffect(() => {
     if (newName) setHasUnsaveWork(true);

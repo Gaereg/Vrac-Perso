@@ -1,6 +1,6 @@
 import DialogAlert from "@components/DialogAlert/DialogAlert";
 import { Chip as MuiChip, Stack } from "@mui/material";
-import { useState, ReactNode, ReactElement } from "react";
+import { useState, ReactElement } from "react";
 
 type TProps = {
   label: string;

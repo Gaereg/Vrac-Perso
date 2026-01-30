@@ -20,7 +20,8 @@ export const useGet = <TData>(key: string, table: string) => {
 export const usePost = <TData, TPayload>(
   key: string,
   table: string,
-  callback: TQueryCallback
+  callback: TQueryCallback,
+  updateCache: boolean = true
 ) => {
   const queryClient = useQueryClient();
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
@@ -32,12 +33,14 @@ export const usePost = <TData, TPayload>(
       return res.data as TData[];
     },
     onSuccess: (newData: TData[]) => {
-      queryClient.setQueryData([key], (oldData: TData[]) => {
-        return [...oldData, ...newData];
-      });
+      if (updateCache) {
+        queryClient.setQueryData([key], (oldData: TData[]) => {
+          return [...oldData, ...newData];
+        });
+      }
       if (callback.onSuccess) callback.onSuccess();
     },
-    onError: (err: TError) => callback.onError(err)
+    onError: (err: TError) => callback.onError(err),
   });
 
   return { mutate, isPending, isSuccess, isError, error };
@@ -46,7 +49,8 @@ export const usePost = <TData, TPayload>(
 export const usePatch = <TData extends TId, TPayload extends TId>(
   key: string,
   table: string,
-  successCallback?: () => void
+  callback: TQueryCallback,
+  updateCache: boolean = true
 ) => {
   const queryClient = useQueryClient();
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
@@ -64,34 +68,46 @@ export const usePatch = <TData extends TId, TPayload extends TId>(
       return res.data as TData[];
     },
     onSuccess: (updatedData: TData[]) => {
-      queryClient.setQueryData([key], (oldData: TData[]) => {
-        const idx = oldData.findIndex((a) => a.id === updatedData[0].id);
-        return updateTabValue(oldData, idx, updatedData[0]);
-      });
-      if (successCallback) successCallback();
+      if (updateCache) {
+        queryClient.setQueryData([key], (oldData: TData[]) => {
+          const idx = oldData.findIndex((a) => a.id === updatedData[0].id);
+          return updateTabValue(oldData, idx, updatedData[0]);
+        });
+      }
+      if (callback.onSuccess) callback.onSuccess();
     },
+    onError: (err: TError) => callback.onError(err),
   });
 
   return { mutate, isPending, isSuccess, isError, error };
 };
 
-export const useDelete = <TData extends TId>(key: string, table: string) => {
+export const useDelete = <TData extends TId>(
+  key: string,
+  table: string,
+  callback: TQueryCallback,
+  updateCache: boolean = true
+) => {
   const queryClient = useQueryClient();
-  const { mutate, isPending, isError, error } = useMutation({
-    mutationFn: async (payload: TId) => {
-      const res = await supabase.from(table).delete().eq("id", payload.id).select();
+  const { mutate, isPending, isError, error, isSuccess } = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await supabase.from(table).delete().eq("id", id).select();
       if (res.error) {
         throw res.error;
       }
       return res.data as TData[];
     },
     onSuccess: (updatedData: TData[]) => {
-      queryClient.setQueryData([key], (oldData: TData[]) => {
-        const idx = oldData.findIndex((a) => a.id === updatedData[0].id);
-        return updateTabValue(oldData, idx);
-      });
+      if (updateCache) {
+        queryClient.setQueryData([key], (oldData: TData[]) => {
+          const idx = oldData.findIndex((a) => a.id === updatedData[0].id);
+          return updateTabValue(oldData, idx);
+        });
+      }
+      if (callback.onSuccess) callback.onSuccess();
     },
+    onError: (err: TError) => callback.onError(err),
   });
 
-  return { mutate, isPending, isError, error };
+  return { mutate, isPending, isSuccess, isError, error };
 };

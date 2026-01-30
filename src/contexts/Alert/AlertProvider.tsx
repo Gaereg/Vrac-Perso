@@ -14,7 +14,10 @@ const AlertProvider = ({children}: {children: ReactNode}) => {
     setMsgError(CodeErr[err.table]?.[err.code] || err.message)
     setIsError(true)
   }
-  const addSuccess = (msg: string) => {}
+  const addSuccess = (msg: string) => {
+    setMsgSuccess(msg);
+    setIsSuccess(true);
+  }
   const closeAlert = () => {
     setIsError(false);
     setIsSuccess(false);

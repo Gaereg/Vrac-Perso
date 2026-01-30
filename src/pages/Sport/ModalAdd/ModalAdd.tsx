@@ -8,7 +8,8 @@ import ModalSummary from "@pages/Sport/ModalAdd/ModalPage/ModalSummary";
 import DialogAlert from "@components/DialogAlert/DialogAlert";
 import ModalTypesExo from "@pages/Sport/ModalAdd/ModalPage/ModalTypesExo";
 import ModalMuscles from "@pages/Sport/ModalAdd/ModalPage/ModalMuscles";
-import ModalExo from "@pages/Sport/ModalAdd/ModalPage/ModalExo";
+import ModalExo from "@pages/Sport/ModalAdd/ModalPage/ModalExo/ModalExo";
+import ModalWeekProg from "@pages/Sport/ModalAdd/ModalPage/ModalWeekProg/ModalWeekProg";
 
 const ModalAdd = ({
   isOpen,
@@ -31,6 +32,8 @@ const ModalAdd = ({
         return <ModalMuscles setHasUnsaveWork={setHasUnsaveWork} />;
       case "exercices":
         return <ModalExo setHasUnsaveWork={setHasUnsaveWork} />;
+      case "weekSessions":
+        return <ModalWeekProg setHasUnsaveWork={setHasUnsaveWork} />;
       default:
         return <ModalSummary setPage={setPage} />;
     }
@@ -44,6 +47,8 @@ const ModalAdd = ({
         return "Muscles";
       case "exercices":
         return "Exercices";
+      case "weekSessions":
+        return "Semaine d'entrainement";
       default:
         return "";
     }
@@ -71,6 +76,8 @@ const ModalAdd = ({
       case "typesExo":
         return "600px";
       case "exercices":
+        return "800px";
+      case "weekSessions":
         return "800px";
       default:
         return "400px";

@@ -15,7 +15,7 @@
       "@enums": ["src/constants/enums.ts"],
       "@clientSupabase": ["src/supabase.ts"],
       "@queries/*": ["src/queries/*"],
-      "@contexts/*": ["src/contexts"]
+      "@contexts/*": ["src/contexts/*"]
     },
 
     /* Configurations de Vite */

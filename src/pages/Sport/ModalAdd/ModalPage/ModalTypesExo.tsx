@@ -18,19 +18,25 @@ const ModalTypesExo = ({ setHasUnsaveWork }: TProps) => {
   const [newName, setNewName] = useState<string>("");
   const [idToModify, setIdToModify] = useState<number | null>(null);
   const typesExo = useGetTypesExo();
-  const { addError } = useAlertDispatch();
+  const { addError, closeAlert } = useAlertDispatch();
 
   const successCallback = () => {
     setNewName("");
     setIdToModify(null);
+    closeAlert();
   };
 
   const postTypesMutation = usePostTypesExo({
     onSuccess: successCallback,
     onError: (err) => addError({ ...err, table: "typesExo" }),
   });
-  const patchTypesMutation = usePatchTypesExo(successCallback);
-  const deleteTypesMutation = useDeleteTypesExo();
+  const patchTypesMutation = usePatchTypesExo({
+    onSuccess: successCallback,
+    onError: (err) => addError({ ...err, table: "typesExo" }),
+  });
+  const deleteTypesMutation = useDeleteTypesExo({
+    onError: (err) => addError({ ...err, table: "typesExo" }),
+  });
 
   const handleChangeTypeName = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewName(e.target.value);
@@ -58,7 +64,7 @@ const ModalTypesExo = ({ setHasUnsaveWork }: TProps) => {
     }
   };
 
-  const handleClickDelete = (id: number) => deleteTypesMutation.mutate({ id });
+  const handleClickDelete = (id: number) => deleteTypesMutation.mutate(id);
 
   useEffect(() => {
     if (newName) setHasUnsaveWork(true);
