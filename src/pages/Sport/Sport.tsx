@@ -39,8 +39,8 @@ const Sport = () => {
             Ajouter / Modifier
           </Button>
           <NestedItemList
-            name="Semaine 1"
-            items={[{ name: "Sceance 1", callback: () => null }]}
+            title="Semaine 1"
+            items={[{ title: "Sceance 1", callback: () => null }]}
           />
         </List>
         <Divider orientation="vertical" className={styles.divider} textAlign="left">

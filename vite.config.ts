@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
-import react from "@vitejs/plugin-react-swc";
+import react, { reactCompilerPreset } from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
 import path from "path";
 
 // https://vite.dev/config/
@@ -18,8 +19,13 @@ export default defineConfig({
       "@enums": path.resolve(__dirname, "./src/constants/enums.ts"),
       "@clientSupabase": path.resolve(__dirname, "./src/supabase.ts"),
       "@queries": path.resolve(__dirname, "./src/queries"),
-      "@contexts": path.resolve(__dirname, "./src/contexts")
+      "@contexts": path.resolve(__dirname, "./src/contexts"),
     },
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    babel({
+      presets: [reactCompilerPreset()],
+    }),
+  ],
 });

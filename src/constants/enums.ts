@@ -29,3 +29,6 @@ export enum muscleGrpTxt {
   SHOULDERS = "Épaules",
   ARMS = "Bras",
 }
+
+// Time in seconds for the repetition of an exercice
+export const repetitionTime = 3;

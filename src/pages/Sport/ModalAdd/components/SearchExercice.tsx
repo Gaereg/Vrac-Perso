@@ -1,6 +1,8 @@
 import { enumMuscleGrp, muscleGrpTxt } from "@enums";
 import {
   Autocomplete,
+  Box,
+  Divider,
   FormControl,
   InputLabel,
   MenuItem,
@@ -15,12 +17,14 @@ import { TExo } from "@queries/sportQueries/types";
 import { useGetTypesExo } from "@queries/sportQueries/typesExo";
 import { SyntheticEvent, useState } from "react";
 
-const FiltersExos = ({
+const SearchExercice = ({
   onChangeExo,
   selectedExo,
+  title,
 }: {
   onChangeExo: (exo: TExo | null) => void;
   selectedExo: TExo | null;
+  title?: string;
 }) => {
   const [typeExo, setTypeExo] = useState<number | "">("");
   const [muscleGrp, setMusclesGrp] = useState<enumMuscleGrp | "">("");
@@ -41,15 +45,14 @@ const FiltersExos = ({
     _e: SyntheticEvent<Element, Event>,
     value: TExo | null
   ) => {
-    console.log(value)
     onChangeExo(value);
   };
 
   return (
-    <>
-      <Typography color="primary">Chercher un exercice</Typography>
+    <Box width="100%">
+      {title && <Typography color="primary">{title}</Typography>}
       <Stack direction="row" my={2} spacing={2}>
-        <FormControl sx={{ width: 200 }} variant="filled" size="small">
+        <FormControl sx={{ flex: 2 }} variant="filled" size="small">
           <InputLabel id="type-exo">Types d'exercice</InputLabel>
           <Select labelId="type-exo" value={typeExo} onChange={handleChangeTypeExo}>
             {typesExo &&
@@ -60,7 +63,7 @@ const FiltersExos = ({
               ))}
           </Select>
         </FormControl>
-        <FormControl sx={{ width: 200 }} variant="filled" size="small">
+        <FormControl sx={{ flex: 2 }} variant="filled" size="small">
           <InputLabel id="muscle-grp">Groupe Musculaire</InputLabel>
           <Select labelId="muscle-grp" value={muscleGrp} onChange={handleChangeMuscleGrp}>
             {Object.values(enumMuscleGrp).map((option) => (
@@ -70,21 +73,21 @@ const FiltersExos = ({
             ))}
           </Select>
         </FormControl>
+        <Divider orientation="vertical" variant="middle" flexItem />
         <Autocomplete
           value={selectedExo}
-          inputValue={selectedExo?.name || ''}
-          id="manageable-states-demo"
+          inputValue={selectedExo?.name || ""}
           options={exercices || []}
           getOptionLabel={(option) => option.name}
           onChange={handleChangeAutocomplete}
-          sx={{ width: 280 }}
+          sx={{ flex: 3 }}
           renderInput={(params) => (
             <TextField {...params} label="Exercices" variant="filled" size="small" />
           )}
         />
       </Stack>
-    </>
+    </Box>
   );
 };
 
-export default FiltersExos;
+export default SearchExercice;

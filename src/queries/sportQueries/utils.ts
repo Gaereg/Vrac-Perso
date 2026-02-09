@@ -1,10 +1,48 @@
 import { supabase } from "@clientSupabase";
-import { TError, TId, TQueryCallback } from "@queries/sportQueries/types";
+import { TError, TId, TQueryCallback, TTables } from "@queries/sportQueries/types";
+import { PostgrestSingleResponse } from "@supabase/supabase-js";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { updateTabValue } from "@utils/array/array";
 
-export const useGet = <TData>(key: string, table: string) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const hasRequestError = (res: PostgrestSingleResponse<any[]>, msg: string) => {
+  if (res.error) {
+    throw res.error;
+  }
+  if (res.data.length === 0) throw { message: msg };
+};
+
+export const patchData = async <T>(
+  table: TTables,
+  payload: T,
+  eqKey: string,
+  eqValue: string | number | boolean,
+) => {
+  const res = await supabase.from(table).update(payload).eq(eqKey, eqValue).select();
+  hasRequestError(res, "Élément à modifier n'a pas été trouvé");
+  return res;
+};
+
+export const delData = async (
+  table: TTables,
+  eqKey: string,
+  eqValue: string | number | boolean,
+) => {
+  const res = await supabase.from(table).delete().eq(eqKey, eqValue).select();
+  if (res.error) {
+    throw res.error;
+  }
+  return res;
+};
+
+export const postData = async <T>(table: TTables, payload: T) => {
+  const res = await supabase.from(table).insert(payload).select();
+  hasRequestError(res, "Erreur lors de la création de l'élément");
+  return res;
+};
+
+export const useGet = <TData>(key: string, table: TTables) => {
   const { data, isPending, isError, error } = useQuery({
     queryKey: [key],
     queryFn: async () => {
@@ -19,17 +57,15 @@ export const useGet = <TData>(key: string, table: string) => {
 
 export const usePost = <TData, TPayload>(
   key: string,
-  table: string,
+  table: TTables,
   callback: TQueryCallback,
-  updateCache: boolean = true
+  updateCache: boolean = true,
 ) => {
   const queryClient = useQueryClient();
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
     mutationFn: async (payload: TPayload) => {
-      const res = await supabase.from(table).insert(payload).select();
-      if (res.error) {
-        throw res.error;
-      }
+      const res = await postData<TPayload>(table, payload);
+
       return res.data as TData[];
     },
     onSuccess: (newData: TData[]) => {
@@ -48,23 +84,14 @@ export const usePost = <TData, TPayload>(
 
 export const usePatch = <TData extends TId, TPayload extends TId>(
   key: string,
-  table: string,
+  table: TTables,
   callback: TQueryCallback,
-  updateCache: boolean = true
+  updateCache: boolean = true,
 ) => {
   const queryClient = useQueryClient();
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
     mutationFn: async (payload: TPayload) => {
-      const res = await supabase
-        .from(table)
-        .update(payload)
-        .eq("id", payload.id)
-        .select();
-
-      if (res.error) {
-        throw res.error;
-      }
-
+      const res = await patchData<TPayload>(table, payload, "id", payload.id);
       return res.data as TData[];
     },
     onSuccess: (updatedData: TData[]) => {
@@ -84,17 +111,14 @@ export const usePatch = <TData extends TId, TPayload extends TId>(
 
 export const useDelete = <TData extends TId>(
   key: string,
-  table: string,
+  table: TTables,
   callback: TQueryCallback,
-  updateCache: boolean = true
+  updateCache: boolean = true,
 ) => {
   const queryClient = useQueryClient();
   const { mutate, isPending, isError, error, isSuccess } = useMutation({
     mutationFn: async (id: number) => {
-      const res = await supabase.from(table).delete().eq("id", id).select();
-      if (res.error) {
-        throw res.error;
-      }
+      const res = await delData(table, "id", id);
       return res.data as TData[];
     },
     onSuccess: (updatedData: TData[]) => {

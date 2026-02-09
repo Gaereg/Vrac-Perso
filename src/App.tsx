@@ -12,6 +12,7 @@ import theme from "./theme";
 import { useEffect, useState } from "react";
 import { supabase } from "@clientSupabase";
 import { Snackbar } from "@components/Snackbar/Snackbar";
+import { ErrorBoundary } from "react-error-boundary";
 
 function App() {
   const [isLog, setIsLog] = useState<boolean>(false);
@@ -47,11 +48,15 @@ function App() {
                   path="*"
                   element={isLog ? <Workspaces /> : <Login setIsLog={setIsLog} />}
                 />
-                 <Route
+                <Route
                   path="/sport"
                   element={
                     <ProtectedRoute isLog={isLog}>
-                      <Sport />
+                      <ErrorBoundary
+                        fallback={<div className="text-red">Something went wrong</div>}
+                      >
+                        <Sport />
+                      </ErrorBoundary>
                     </ProtectedRoute>
                   }
                 />

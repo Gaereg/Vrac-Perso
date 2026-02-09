@@ -4,18 +4,18 @@ import List from "@mui/material/List";
 import NestedItem from "@components/NestedItem/NestedItem";
 
 type TItems = {
-  name: string;
-  callback: (name: string) => void;
+  title: string;
+  callback: (title: string) => void;
 }[];
 
-const NestedItemList = ({ name, items }: { name: string; items: TItems }) => {
+const NestedItemList = ({ title, items }: { title: string; items: TItems }) => {
   return (
     <>
-      <NestedItem name={name}>
+      <NestedItem title={title} openDefault>
         <List component="div" disablePadding>
           {items.map((item) => (
-            <ListItemButton sx={{ pl: 4 }} key={item.name}>
-              <ListItemText primary={item.name} />
+            <ListItemButton sx={{ pl: 4 }} key={item.title}>
+              <ListItemText primary={item.title} />
             </ListItemButton>
           ))}
         </List>

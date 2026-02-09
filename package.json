@@ -12,31 +12,33 @@
     "supabase_gen_types": "npm supabase gen types typescript --project-id abcdefghijklmnopqrst > database.types.ts"
   },
   "dependencies": {
+    "@base-ui/react": "^1.1.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.6",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
     "@mui/styled-engine-sc": "^7.3.2",
-    "@supabase/auth-ui-react": "^0.4.7",
-    "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.77.0",
-    "@tanstack/react-query": "^5.90.7",
+    "@tanstack/react-query": "^5.95.2",
     "@tanstack/react-query-devtools": "^5.90.2",
     "classnames": "^2.5.1",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-error-boundary": "^6.1.1",
     "react-router": "^7.8.2",
     "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@rolldown/plugin-babel": "^0.2.2",
     "@tanstack/eslint-plugin-query": "^5.91.2",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^24.3.0",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react-swc": "^4.0.0",
+    "@vitejs/plugin-react": "^6.0.1",
+    "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.33.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
@@ -44,7 +46,7 @@
     "jsdom": "^26.1.0",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.39.1",
-    "vite": "^7.1.2",
-    "vitest": "^3.2.4"
+    "vite": "^8.0.1",
+    "vitest": "^4.1.0"
   }
 }

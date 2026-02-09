@@ -1,8 +1,8 @@
 import { TId, TPayload, TQueryCallback, TTypesExo } from "./types.ts";
 import { useDelete, useGet, usePatch, usePost } from "@queries/sportQueries/utils.ts";
+import { typesExoTable } from "@queries/sportQueries/table.ts";
 
 const typesExoKey = "dataTypesExo";
-const typesExoTable = "types_exercices";
 
 export const useGetTypesExo = () => useGet<TTypesExo>(typesExoKey, typesExoTable);
 

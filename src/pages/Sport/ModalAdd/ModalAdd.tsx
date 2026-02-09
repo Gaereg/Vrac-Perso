@@ -10,6 +10,7 @@ import ModalTypesExo from "@pages/Sport/ModalAdd/ModalPage/ModalTypesExo";
 import ModalMuscles from "@pages/Sport/ModalAdd/ModalPage/ModalMuscles";
 import ModalExo from "@pages/Sport/ModalAdd/ModalPage/ModalExo/ModalExo";
 import ModalWeekProg from "@pages/Sport/ModalAdd/ModalPage/ModalWeekProg/ModalWeekProg";
+import ModalBlocExos from "@pages/Sport/ModalAdd/ModalPage/ModalBlocExo/ModalBlocExos";
 
 const ModalAdd = ({
   isOpen,
@@ -34,6 +35,8 @@ const ModalAdd = ({
         return <ModalExo setHasUnsaveWork={setHasUnsaveWork} />;
       case "weekSessions":
         return <ModalWeekProg setHasUnsaveWork={setHasUnsaveWork} />;
+      case "blocExos":
+        return <ModalBlocExos setHasUnsaveWork={setHasUnsaveWork}/>;
       default:
         return <ModalSummary setPage={setPage} />;
     }
@@ -49,6 +52,8 @@ const ModalAdd = ({
         return "Exercices";
       case "weekSessions":
         return "Semaine d'entrainement";
+      case "blocExos":
+        return "Bloc d'Exercices";
       default:
         return "";
     }
@@ -79,6 +84,8 @@ const ModalAdd = ({
         return "800px";
       case "weekSessions":
         return "800px";
+      case "blocExos":
+        return "800px";
       default:
         return "400px";
     }
@@ -92,7 +99,7 @@ const ModalAdd = ({
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box className={styles.modal} maxWidth={modalWidth} minWidth="400px">
+        <Box className={styles.modal} width={modalWidth} maxHeight='1200px' overflow="auto">
           <Box className={styles.modalHeader}>
             {page !== "summary" && (
               <IconButton onClick={handleGoSummary} className={styles.btnGoSummary}>

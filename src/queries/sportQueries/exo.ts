@@ -9,7 +9,14 @@ import {
   TPayloadLinkedMuscle,
   TQueryCallback,
 } from "@queries/sportQueries/types";
-import { useDelete, useGet, usePatch, usePost } from "@queries/sportQueries/utils.ts";
+import {
+  delData,
+  patchData,
+  postData,
+  useDelete,
+  useGet,
+  usePatch,
+} from "@queries/sportQueries/utils.ts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -18,8 +25,20 @@ const exoKeyFiltered = "dataFilteredExos";
 
 export const useGetExos = () => useGet<TExo>(exoKey, exoTableJoin);
 
-const cleanTabNumber = (tab: (number | null)[]): number[] =>
-  tab.filter((el) => typeof el === "number");
+const cleanTabNumber = (
+  tab: (number | null)[],
+  exoId: number,
+  tabPrimary?: number[],
+): TPayloadLinkedMuscle[] => {
+  const filteredTab = tab.filter((el) => {
+    return typeof el === "number" && (!tabPrimary || !tabPrimary.includes(el));
+  }) as number[];
+  return filteredTab.map((muscleId) => ({
+    muscle_id: muscleId,
+    exo_id: exoId,
+    muscle_type: tabPrimary ? "SECONDARY" : "PRIMARY",
+  }));
+};
 
 export const useGetFilteredExos = ({
   typeExo,
@@ -47,158 +66,81 @@ export const useGetFilteredExos = ({
 export const usePostExo = (callback: TQueryCallback) => {
   const queryClient = useQueryClient();
 
-  const {
-    mutate: exoMutate,
-    isPending,
-    isSuccess,
-    isError: isExoError,
-    error: exoError,
-  } = usePost<TExo, TExoPayloadTable>(exoKey, exoTable, callback, false);
+  return useMutation({
+    mutationFn: async (payload: TPayloadExo) => {
+      const { main_muscles_id, secondary_muscles_id, ...cleanPayload } = payload;
 
-  const {
-    mutate: linkedMuscleMutate,
-    isError: isMuscleError,
-    error: muscleError,
-  } = useMutation({
-    mutationFn: async (payload: TPayloadLinkedMuscle) => {
-      return supabase.from(linkedMusclesTable).insert(payload);
+      const resPostExo = await postData(exoTable, cleanPayload);
+      if (!resPostExo.data) throw { message: "Erreur lors de la création de l'exercice" };
+
+      const exoId = resPostExo.data[0].id;
+      const musclesPayload = [
+        ...cleanTabNumber(main_muscles_id, exoId),
+        ...cleanTabNumber(secondary_muscles_id, exoId, main_muscles_id),
+      ];
+
+      const resLinkedMuscles = await postData(linkedMusclesTable, musclesPayload);
+
+      return [resPostExo, resLinkedMuscles];
+    },
+    onSuccess: async () => {
+      if (callback.onSuccess) callback.onSuccess();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [exoKey] }),
+        queryClient.invalidateQueries({ queryKey: [exoKeyFiltered] }),
+      ]);
     },
   });
-
-  const mutate = (payload: TPayloadExo) => {
-    const { main_muscles_id, secondary_muscles_id, ...cleanPayload } = payload;
-    exoMutate(cleanPayload, {
-      onSuccess: (newExo) => {
-        if (newExo) {
-          const { id } = newExo[0];
-          [
-            cleanTabNumber(main_muscles_id),
-            cleanTabNumber(secondary_muscles_id),
-          ]?.forEach((tab, idx) => {
-            tab?.forEach((musclesId) =>
-              linkedMuscleMutate(
-                {
-                  muscle_id: musclesId as number,
-                  exo_id: id,
-                  muscle_type: idx === 0 ? "PRIMARY" : "SECONDARY",
-                },
-                {
-                  onSuccess: async () => {
-                    await Promise.all([
-                      queryClient.invalidateQueries({ queryKey: [exoKey] }),
-                      queryClient.invalidateQueries({ queryKey: [exoKeyFiltered] }),
-                    ]);
-                  },
-                }
-              )
-            );
-          });
-        }
-      },
-    });
-  };
-
-  const isError = useMemo(
-    () => isExoError || isMuscleError || false,
-    [isExoError, isMuscleError]
-  );
-  const error = useMemo(() => exoError || muscleError || null, [exoError, muscleError]);
-
-  return { mutate, isPending, isSuccess, isError, error };
 };
 
 export const usePatchExo = (callback: TQueryCallback) => {
   const queryClient = useQueryClient();
 
-  const {
-    mutate: exoMutate,
-    isPending,
-    isSuccess,
-    isError: isExoError,
-    error: exoError,
-  } = usePatch<TExo, TExoPayloadTable & TId>(exoKey, exoTable, callback, false);
+  return useMutation({
+    mutationFn: async (payload: TExo) => {
+      const { main_muscles_id, secondary_muscles_id, ...cleanPayload } = payload;
+      const musclesPayload = [
+        ...cleanTabNumber(main_muscles_id, payload.id),
+        ...cleanTabNumber(secondary_muscles_id, payload.id, main_muscles_id),
+      ];
 
-  const { mutate: deletelinkedMutate } = useMutation({
-    mutationFn: async (exo_id: number) =>
-      await supabase.from(linkedMusclesTable).delete().eq("exo_id", exo_id).select(),
-  });
+      const [resPatchExo, resDelLinkedMuscles] = await Promise.all([
+        patchData(exoTable, cleanPayload, "id", payload.id),
+        delData(linkedMusclesTable, "exo_id", payload.id),
+      ]);
 
-  const {
-    mutate: linkedMuscleMutate,
-    isError: isMuscleError,
-    error: muscleError,
-  } = useMutation({
-    mutationFn: async (payload: TPayloadLinkedMuscle) => {
-      return supabase.from(linkedMusclesTable).insert(payload);
+      const resPostLinkedMuscles = await postData(linkedMusclesTable, musclesPayload);
+
+      return [resPatchExo, resDelLinkedMuscles, resPostLinkedMuscles];
+    },
+    onSuccess: async () => {
+      if (callback.onSuccess) callback.onSuccess();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [exoKey] }),
+        queryClient.invalidateQueries({ queryKey: [exoKeyFiltered] }),
+      ]);
     },
   });
-
-  const mutate = (payload: TPayloadExo & TId) => {
-    const { main_muscles_id, secondary_muscles_id, ...cleanPayload } = payload;
-    exoMutate(cleanPayload);
-    deletelinkedMutate(payload.id, {
-      onSuccess: () => {
-        [cleanTabNumber(main_muscles_id), cleanTabNumber(secondary_muscles_id)]?.forEach(
-          (tab, idx) => {
-            tab?.forEach((musclesId) =>
-              linkedMuscleMutate(
-                {
-                  muscle_id: musclesId as number,
-                  exo_id: payload.id,
-                  muscle_type: idx === 0 ? "PRIMARY" : "SECONDARY",
-                },
-                {
-                  onSuccess: async () => {
-                    await Promise.all([
-                      queryClient.invalidateQueries({ queryKey: [exoKey] }),
-                      queryClient.invalidateQueries({ queryKey: [exoKeyFiltered] }),
-                    ]);
-                  },
-                }
-              )
-            );
-          }
-        );
-      },
-    });
-  };
-
-  const isError = useMemo(
-    () => isExoError || isMuscleError || false,
-    [isExoError, isMuscleError]
-  );
-  const error = useMemo(() => exoError || muscleError || null, [exoError, muscleError]);
-
-  return { mutate, isPending, isSuccess, isError, error };
-};
+}
 
 export const useDeleteExo = (callback: TQueryCallback) => {
   const queryClient = useQueryClient();
 
-  const {
-    mutate: exoMutate,
-    isPending,
-    isSuccess,
-    isError,
-    error,
-  } = useDelete<TExo>(exoKey, exoTable, callback, false);
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const [resDelExo, resDelLinkedMuscles] = await Promise.all([
+        delData(exoTable, "id", id),
+        delData(linkedMusclesTable, "exo_id", id),
+      ]);
 
-  const { mutate: deletelinkedMutate } = useMutation({
-    mutationFn: async (exo_id: number) =>
-      await supabase.from(linkedMusclesTable).delete().eq("exo_id", exo_id).select(),
+      return [resDelExo, resDelLinkedMuscles];
+    },
+    onSuccess: async () => {
+      if (callback.onSuccess) callback.onSuccess();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: [exoKey] }),
+        queryClient.invalidateQueries({ queryKey: [exoKeyFiltered] }),
+      ]);
+    },
   });
-
-  const mutate = (id: number) => {
-    exoMutate(id);
-    deletelinkedMutate(id, {
-      onSuccess: async () => {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: [exoKey] }),
-          queryClient.invalidateQueries({ queryKey: [exoKeyFiltered] }),
-        ]);
-      },
-    });
-  };
-
-  return { mutate, isPending, isSuccess, isError, error };
-};
+}

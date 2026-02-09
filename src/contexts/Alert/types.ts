@@ -17,7 +17,7 @@ export type TAlertDispatch = {
 export type TAlertError = TError & { table: keyof typeof CodeErr };
 
 export type TCodeErr = {
-  [type in "typesExo" | "muscles" | "exercices"]: {
+  [type in "typesExo" | "muscles" | "exercices" | "blocExo"]: {
     [index: string]: string;
   };
 };

@@ -17,7 +17,7 @@ type TProps = {
 
 const SelectMuscles = ({ choices, value, onChange, isMain = false }: TProps) => {
   return (
-    <FormControl sx={{ width: 350 }} required>
+    <FormControl sx={{ width: 350, flex: 1 }} required>
       <InputLabel id={`${isMain ? "main" : "sub"}-muscle`}>
         Mucles {isMain ? "Principaux" : "Secondaire"}
       </InputLabel>

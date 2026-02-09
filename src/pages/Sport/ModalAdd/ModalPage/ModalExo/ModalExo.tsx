@@ -18,17 +18,19 @@ import { useDeleteExo, usePatchExo, usePostExo } from "@queries/sportQueries/exo
 import { enumMuscleGrp } from "@enums";
 import { useAlertDispatch } from "@contexts/Alert/AlertContext";
 import SelectMuscles from "@pages/Sport/ModalAdd/ModalPage/ModalExo/SelectMuscles";
-import FiltersExos from "@pages/Sport/ModalAdd/ModalPage/ModalExo/FiltersExos";
-import { TExo } from "@queries/sportQueries/types";
+import SearchExercice from "@pages/Sport/ModalAdd/components/SearchExercice";
+import { TError, TExo } from "@queries/sportQueries/types";
 import DialogAlert from "@components/DialogAlert/DialogAlert";
 
 type TNewExo = {
-  id?:number;
+  id?: number;
   name: string;
   description: string;
   type_exercice_id: number | "";
   main_muscles_id: number[];
   secondary_muscles_id: number[];
+  main_muscles?: string[];
+  secondary_muscles?: string[];
 };
 
 const newExoDefaultValue = {
@@ -50,36 +52,18 @@ const ModalExo = ({
   const [isAlertDelete, setIsAlertDelete] = useState<boolean>(false);
 
   const { addError, closeAlert, addSuccess } = useAlertDispatch();
-  const postExo = usePostExo({
-    onSuccess: () => {
-      closeAlert();
-      addSuccess(`L'exercice ${newExo.name} a bien été créé`);
-      resetValue();
-    },
-    onError: (err) => addError({ ...err, table: "exercices" }),
-  });
-  const patchExo = usePatchExo({
-    onSuccess: () => {
-      closeAlert();
-      addSuccess(`L'exercice ${newExo.name} a bien été modifié`);
-      resetValue();
-    },
-    onError: (err) => {
-      console.log(err);
-      addError({ ...err, table: "exercices" });
-    },
-  });
 
-  const deleteExo = useDeleteExo({
+  const queryCallback = (suffixMsgSuccess: string) => ({
     onSuccess: () => {
       closeAlert();
-      addSuccess(`L'exercice ${newExo.name} a bien été supprimé`);
+      addSuccess(`L'exercice ${newExo.name} a bien été ${suffixMsgSuccess}`);
       resetValue();
     },
-    onError: (err) => {
-      addError({ ...err, table: "exercices" });
-    },
-  });
+    onError: (err:TError) => addError({ ...err, table: "exercices" }),
+  })
+  const postExo = usePostExo(queryCallback('créé'));
+  const patchExo = usePatchExo(queryCallback("modifié"));
+  const deleteExo = useDeleteExo(queryCallback("supprimé"));
 
   const changeNewExo = <T,>(key: keyof TNewExo, value: T) =>
     setNewExo({ ...newExo, [key]: value });
@@ -118,7 +102,8 @@ const ModalExo = ({
     };
 
     if (newExo.id) {
-      patchExo.mutate({...payload, id: newExo.id});
+      const { main_muscles, secondary_muscles, ...cleanPayload } = payload;
+      patchExo.mutate({ ...cleanPayload, id: newExo.id });
     } else {
       postExo.mutate(payload);
     }
@@ -156,7 +141,11 @@ const ModalExo = ({
         title={`Êtes-vous sur de vouloir supprimer l'exercice: ${newExo.name}`}
         content={`La suppression d'un exercice peut avoir un impact si des entrainements l'utilisais`}
       />
-      <FiltersExos onChangeExo={handleSelectExo} selectedExo={newExo.id ? newExo as TExo : null} />
+      <SearchExercice
+        title="Chercher un exercice"
+        onChangeExo={handleSelectExo}
+        selectedExo={newExo.id ? (newExo as TExo) : null}
+      />
       <Divider />
       {typesExo && muscles ? (
         <form onSubmit={handleSave}>
@@ -167,10 +156,10 @@ const ModalExo = ({
                 label="Nom de l'exercice"
                 value={newExo.name}
                 onChange={handleChangeName}
-                sx={{ width: "350px" }}
+                sx={{ width: "350px", flex: 1 }}
               />
 
-              <FormControl sx={{ width: 350 }} required>
+              <FormControl sx={{ width: 350, flex: 1 }} required>
                 <InputLabel id="type-exo">Types d'exercice</InputLabel>
                 <Select
                   labelId="type-exo"
@@ -215,10 +204,10 @@ const ModalExo = ({
           <Stack direction="row" spacing={2} justifyContent="flex-end">
             {newExo.id && (
               <>
-              <Button variant="text" onClick={handleOpenAlertDelete} color="warning">
-                Supprimer
-              </Button>
-              <Button onClick={handleCancelModification}>Annuler</Button>
+                <Button variant="text" onClick={handleOpenAlertDelete} color="warning">
+                  Supprimer
+                </Button>
+                <Button onClick={handleCancelModification}>Annuler</Button>
               </>
             )}
             <Button variant="outlined" type="submit" color="primary">

@@ -1,1 +1,1 @@
-export type TModalAddPage = "summary" | "typesExo" | "muscles" | "exercices" | "weekSessions";
+export type TModalAddPage = "summary" | "typesExo" | "muscles" | "exercices" | "blocExos" | "weekSessions";
